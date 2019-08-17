@@ -1,25 +1,27 @@
 import * as mongoose from 'mongoose';
 import { AnswerSchema } from '../models/anserModel';
 import { Request, Response } from 'express';
-import request = require('request');
+import aws = require('aws-sdk');
 
-const Answer = mongoose.model('Answer', AnswerSchema);
-const AnalizeHook = process.env.ANALIZEHOOK;
+const queueUrl = process.env.ANALIZEHOOK;
+const sqs = new aws.SQS();
 const EmitAnalizeHook = (answer_id: string) => {
-    request.post(
-        AnalizeHook,
-        { json: { answer_id, msg: 'updated' } },
-        function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                console.log(body);
-            }
-            else {
-                console.log(error);
-            }
+    const params = {
+        MessageBody: answer_id,
+        QueueUrl: queueUrl,
+        DelaySeconds: 0
+    };
+    sqs.sendMessage(params, function (err, data) {
+        if (err) {
+            console.log(err);
         }
-    );
+        else {
+            console.log(data);
+        }
+    });
 };
 
+const Answer = mongoose.model('Answer', AnswerSchema);
 export class AnswerController {
 
     public addNewAnswer(req: Request, res: Response) {
