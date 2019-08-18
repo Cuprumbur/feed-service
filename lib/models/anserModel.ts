@@ -12,6 +12,8 @@ export const AnswerSchema = new Schema({
         required: 'name is required'
     },
     questions: [{
+        phraseOne: String,
+        phraseTwo: String,
         question: String,
         answer: String,
     }],
