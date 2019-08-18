@@ -5,7 +5,7 @@ import aws = require('aws-sdk');
 
 const queueUrl = process.env.ANALIZEHOOK;
 const sqs = new aws.SQS();
-const EmitAnalizeHook = (answer_id: string) => {
+const EmitAnalizeHook = function (answer_id: string) {
     const params = {
         MessageBody: answer_id,
         QueueUrl: queueUrl,
@@ -32,7 +32,7 @@ export class AnswerController {
                 res.send(err);
             }
             res.json(answer);
-            EmitAnalizeHook(answer._id);
+            EmitAnalizeHook(answer.id);
         });
     }
 
@@ -46,7 +46,7 @@ export class AnswerController {
     }
 
     public getAnswerWithID(req: Request, res: Response) {
-        Answer.findById(req.params._id, (err, answer) => {
+        Answer.findById({ _id: req.params["_id"] }, (err, answer) => {
             if (err) {
                 res.send(err);
             }
@@ -55,7 +55,7 @@ export class AnswerController {
     }
 
     public updateAnswer(req: Request, res: Response) {
-        Answer.findOneAndUpdate(req.params._id, req.body, { new: true }, (err, answer) => {
+        Answer.findOneAndUpdate({ _id: req.params["_id"] }, req.body, { new: true }, (err, answer) => {
             if (err) {
                 res.send(err);
             }
@@ -64,7 +64,7 @@ export class AnswerController {
     }
 
     public deleteQuiz(req: Request, res: Response) {
-        Answer.remove(req.params._id, (err, answer) => {
+        Answer.remove({ _id: req.params["_id"] }, (err, answer) => {
             if (err) {
                 res.send(err);
             }
